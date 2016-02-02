@@ -56,32 +56,6 @@ public class Buttons : MonoBehaviour
         UpdateText();
 	}
 
-    public void InputEquals(string input)
-    {
-        _canOpenBracket = false;
-        _lastIsOperand = false;
-
-        //Add all remaining closing brackets to the endof the equation
-        while (_numberOpenBrackets > 0)
-        {
-            _numberOpenBrackets--;
-            _equation.Append(" )");
-        }
-
-        //Remove double spaces and ending spaces to optimize things a little
-        string fullEquation = _equation.ToString();
-        fullEquation = fullEquation.Replace("  ", " ");
-        fullEquation = fullEquation.Trim();
-
-        List<string> splitEquation = new List<string>(fullEquation.Split(' '));
-
-        //Clear the buffer for a new string and calculate
-        _equation.Length = 0;
-        _equation.Append(SolveEquation(splitEquation, 0, splitEquation.Count));
-
-        UpdateText();
-    }
-
     public void InputClear(string input)
     {
         _lastIsOperand = false;
@@ -125,39 +99,30 @@ public class Buttons : MonoBehaviour
         UpdateText();
     }
 
-    private void UpdateText()
+    public void InputEquals(string input)
     {
-        if(_equation.Length <= 0)
-        {
-            _currentNumberText.text = "0";
-            _fullEquationText.text = "";
-        }
-        else
-        {
-            string fullEquation = _equation.ToString();
-            int lastSpace = fullEquation.LastIndexOf(' ');
-            if(lastSpace > 0)
-            {
-                string lastNumber = fullEquation.Substring(lastSpace+1);
+        _canOpenBracket = false;
+        _lastIsOperand = false;
 
-                if (lastNumber.Length > 0)
-                {
-                    _currentNumberText.text = lastNumber;
-                }
-                else
-                {
-                    _currentNumberText.text = "0";
-                }
-            }
-            else
-            {
-                _currentNumberText.text = fullEquation;
-            }
-            _fullEquationText.text = fullEquation;
+        //Add all remaining closing brackets to the endof the equation
+        while (_numberOpenBrackets > 0)
+        {
+            _numberOpenBrackets--;
+            _equation.Append(" )");
         }
 
-        _openBracket.interactable = _canOpenBracket;
-        _closeBracket.interactable = _numberOpenBrackets > 0;
+        //Remove double spaces and ending spaces to optimize things a little
+        string fullEquation = _equation.ToString();
+        fullEquation = fullEquation.Replace("  ", " ");
+        fullEquation = fullEquation.Trim();
+
+        List<string> splitEquation = new List<string>(fullEquation.Split(' '));
+
+        //Clear the buffer for a new string and calculate
+        _equation.Length = 0;
+        _equation.Append(SolveEquation(splitEquation, 0, splitEquation.Count));
+
+        UpdateText();
     }
 
     private string SolveEquation(List<string> splitEquation, int start, int end)
@@ -184,8 +149,7 @@ public class Buttons : MonoBehaviour
                 {
                     endIndex = i;
                     string result = SolveEquation(splitEquation, startIndex+1, endIndex);
-                    splitEquation.RemoveAt(startIndex);
-                    splitEquation.RemoveAt(startIndex);
+                    splitEquation.RemoveRange(startIndex, 2);
                     splitEquation[startIndex] = result;
 
                     i = startIndex;
@@ -226,10 +190,45 @@ public class Buttons : MonoBehaviour
 
         float total = operation.Invoke(first, second);
 
-        split.RemoveAt(index - 1);
-        split.RemoveAt(index - 1);
+        split.RemoveRange(index - 1, 2);
         split[index - 1] = total.ToString();
         index -= 2;
         endValue -= 2;
+    }
+
+    private void UpdateText()
+    {
+        if (_equation.Length <= 0)
+        {
+            _currentNumberText.text = "0";
+            _fullEquationText.text = "";
+        }
+        else
+        {
+            string fullEquation = _equation.ToString();
+            int lastSpace = fullEquation.LastIndexOf(' ');
+            if (lastSpace > 0)
+            {
+                string lastNumber = fullEquation.Substring(lastSpace + 1);
+
+                if (lastNumber.Length > 0)
+                {
+                    _currentNumberText.text = lastNumber;
+                }
+                else
+                {
+                    _currentNumberText.text = "0";
+                }
+            }
+            else
+            {
+                _currentNumberText.text = fullEquation;
+            }
+            _fullEquationText.text = fullEquation;
+
+        }
+
+        _openBracket.interactable = _canOpenBracket;
+        _closeBracket.interactable = _numberOpenBrackets > 0;
     }
 }
