@@ -33,6 +33,7 @@ public class Buttons : MonoBehaviour
     private int _numberOpenBrackets = 0;
     private bool _canOpenBracket = true;
     private bool _lastIsOperand = false;
+    private bool _newEquation = true;
 
     void Start()
     {
@@ -48,10 +49,17 @@ public class Buttons : MonoBehaviour
 
 	public void InputNumber(string input)
 	{
+        //We have just pressed equals, so a new number will overwrite what we have.
+        if (_newEquation)
+        {
+            _equation.Length = 0;
+        }
+
         _equation.Append(input);
 
         _canOpenBracket = false;
         _lastIsOperand = false;
+        _newEquation = false;
 
         UpdateText();
 	}
@@ -61,6 +69,7 @@ public class Buttons : MonoBehaviour
         _lastIsOperand = false;
         _canOpenBracket = true;
         _equation.Length = 0;
+        _newEquation = false;
 
         UpdateText();
     }
@@ -96,6 +105,8 @@ public class Buttons : MonoBehaviour
             _equation.Append(" " + input + " ");
         }
 
+        _newEquation = false;
+
         UpdateText();
     }
 
@@ -121,6 +132,8 @@ public class Buttons : MonoBehaviour
         //Clear the buffer for a new string and calculate
         _equation.Length = 0;
         _equation.Append(SolveEquation(splitEquation, 0, splitEquation.Count));
+
+        _newEquation = true;
 
         UpdateText();
     }
@@ -230,5 +243,106 @@ public class Buttons : MonoBehaviour
 
         _openBracket.interactable = _canOpenBracket;
         _closeBracket.interactable = _numberOpenBrackets > 0;
+    }
+
+    private void Update()
+    {
+        #region keyboard number input
+        if (Input.GetKeyDown(KeyCode.Keypad0) || Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            InputNumber("0");
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad1) || Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            InputNumber("1");
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad2) || Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            InputNumber("2");
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad3) || Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            InputNumber("3");
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad4) || Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            InputNumber("4");
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad5) || Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            InputNumber("5");
+        }
+
+        //Special case for 6 as it can also be used for Caret or Power symbol
+        if (Input.GetKeyDown(KeyCode.Keypad6) || Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+            {
+                InputSymbol("^");
+            }
+            else
+            {
+                InputNumber("6");
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad7) || Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            InputNumber("7");
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad8) || Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            InputNumber("8");
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad9) || Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            InputNumber("9");
+        }
+        if (Input.GetKeyDown(KeyCode.KeypadPeriod) || Input.GetKeyDown(KeyCode.Period))
+        {
+            InputNumber(".");
+        }
+        #endregion
+
+        #region keyboard_symbol_input
+        if (Input.GetKeyDown(KeyCode.KeypadPlus) || Input.GetKeyDown(KeyCode.Plus))
+        {
+            InputSymbol("+");
+        }
+        if (Input.GetKeyDown(KeyCode.KeypadMinus) || Input.GetKeyDown(KeyCode.Minus))
+        {
+            InputSymbol("-");
+        }
+        if (Input.GetKeyDown(KeyCode.KeypadDivide) || Input.GetKeyDown(KeyCode.Slash))
+        {
+            InputSymbol("/");
+        }
+        if (Input.GetKeyDown(KeyCode.KeypadMultiply) || Input.GetKeyDown(KeyCode.Asterisk))
+        {
+            InputSymbol("*");
+        }
+        //Note, Power or Caret is in the numbers section because of the overloaded 6 character
+        #endregion
+
+        #region bracket_symbols
+        if (_canOpenBracket && (Input.GetKeyDown(KeyCode.LeftParen) || Input.GetKeyDown(KeyCode.LeftBracket)))
+        {
+            InputSymbol("(");
+        }
+        else if (_numberOpenBrackets > 0 && (Input.GetKeyDown(KeyCode.RightParen) || Input.GetKeyDown(KeyCode.RightBracket)))
+        {
+            InputSymbol(")");
+        }
+        #endregion
+
+        #region other_symbols
+        if (Input.GetKeyDown(KeyCode.KeypadEquals) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
+        {
+            InputEquals("=");
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Backspace))
+        {
+            InputClear("Clear");
+        }
+        #endregion
     }
 }
