@@ -16,6 +16,8 @@ public class Buttons : MonoBehaviour
     private Button _openBracket = null;
     [SerializeField]
     private Button _closeBracket = null;
+    [SerializeField]
+    private List<Button> _numberButtons = new List<Button>();
     #endregion
 
     #region Lambda_Function
@@ -33,6 +35,7 @@ public class Buttons : MonoBehaviour
     private int _numberOpenBrackets = 0;
     private bool _canOpenBracket = true;
     private bool _lastIsOperand = false;
+    private bool _lastIsCloseBracket = false;
     private bool _newEquation = true;
 
     void Start()
@@ -60,6 +63,7 @@ public class Buttons : MonoBehaviour
         _canOpenBracket = false;
         _lastIsOperand = false;
         _newEquation = false;
+        _lastIsCloseBracket = false;
 
         UpdateText();
 	}
@@ -70,12 +74,21 @@ public class Buttons : MonoBehaviour
         _canOpenBracket = true;
         _equation.Length = 0;
         _newEquation = false;
+        _lastIsCloseBracket = false;
 
         UpdateText();
     }
 
     public void InputSymbol(string input)
     {
+        string checker = _equation.ToString();
+        if(checker == "Infinity" || checker == "NaN")
+        {
+            InputClear("Clear");
+        }
+
+        _lastIsCloseBracket = false;
+
         if (input == "(")
         {
             _lastIsOperand = false;
@@ -86,6 +99,7 @@ public class Buttons : MonoBehaviour
         {
             _lastIsOperand = false;
             _canOpenBracket = false;
+            _lastIsCloseBracket = true;
             if(_numberOpenBrackets > 0)
             {
                 _numberOpenBrackets--;
@@ -102,6 +116,12 @@ public class Buttons : MonoBehaviour
         {
             _lastIsOperand = true;
             _canOpenBracket = true;
+
+            if (_equation.Length == 0 || (_equation.Length > 2 && _equation[_equation.Length - 2] == '(') )
+            {
+                InputNumber("0");
+            }
+
             _equation.Append(" " + input + " ");
         }
 
@@ -114,6 +134,7 @@ public class Buttons : MonoBehaviour
     {
         _canOpenBracket = false;
         _lastIsOperand = false;
+        _lastIsCloseBracket = false;
 
         //Add all remaining closing brackets to the endof the equation
         while (_numberOpenBrackets > 0)
@@ -243,6 +264,11 @@ public class Buttons : MonoBehaviour
 
         _openBracket.interactable = _canOpenBracket;
         _closeBracket.interactable = _numberOpenBrackets > 0;
+
+        foreach(Button button in _numberButtons)
+        {
+            button.interactable = !_lastIsCloseBracket;
+        }
     }
 
     private void Update()
