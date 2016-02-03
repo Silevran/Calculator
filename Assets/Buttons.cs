@@ -8,9 +8,9 @@ public class Buttons : MonoBehaviour
 {
     #region SerializeFields
     [SerializeField]
-	private Text _currentNumberText = null;
-	[SerializeField]
-	private Text _fullEquationText = null;
+    private Text _currentNumberText = null;
+    [SerializeField]
+    private Text _fullEquationText = null;
 
     [SerializeField]
     private Button _openBracket = null;
@@ -28,7 +28,7 @@ public class Buttons : MonoBehaviour
     Func<float, float, float> pow = (x, y) => Mathf.Pow(x, y);
     #endregion
 
-    private Dictionary<string, Func<float, float, float>> _firstOrderOfOperations  = new Dictionary<string, Func<float, float, float>>();
+    private Dictionary<string, Func<float, float, float>> _firstOrderOfOperations = new Dictionary<string, Func<float, float, float>>();
     private Dictionary<string, Func<float, float, float>> _secondOrderOfOperations = new Dictionary<string, Func<float, float, float>>();
 
     private StringBuilder _equation = new StringBuilder();
@@ -50,8 +50,8 @@ public class Buttons : MonoBehaviour
         _secondOrderOfOperations.Add("-", sub);
     }
 
-	public void InputNumber(string input)
-	{
+    public void InputNumber(string input)
+    {
         //We have just pressed equals, so a new number will overwrite what we have.
         if (_newEquation)
         {
@@ -66,7 +66,7 @@ public class Buttons : MonoBehaviour
         _lastIsCloseBracket = false;
 
         UpdateText();
-	}
+    }
 
     public void InputClear(string input)
     {
@@ -82,7 +82,7 @@ public class Buttons : MonoBehaviour
     public void InputSymbol(string input)
     {
         string checker = _equation.ToString();
-        if(checker == "Infinity" || checker == "NaN")
+        if (checker == "Infinity" || checker == "NaN")
         {
             InputClear("Clear");
         }
@@ -100,7 +100,7 @@ public class Buttons : MonoBehaviour
             _lastIsOperand = false;
             _canOpenBracket = false;
             _lastIsCloseBracket = true;
-            if(_numberOpenBrackets > 0)
+            if (_numberOpenBrackets > 0)
             {
                 _numberOpenBrackets--;
                 _equation.Append(" " + input + " ");
@@ -117,7 +117,7 @@ public class Buttons : MonoBehaviour
             _lastIsOperand = true;
             _canOpenBracket = true;
 
-            if (_equation.Length == 0 || (_equation.Length > 2 && _equation[_equation.Length - 2] == '(') )
+            if (_equation.Length == 0 || (_equation.Length > 2 && _equation[_equation.Length - 2] == '('))
             {
                 InputNumber("0");
             }
@@ -133,6 +133,12 @@ public class Buttons : MonoBehaviour
     public void InputEquals(string input)
     {
         _canOpenBracket = false;
+
+        if (_lastIsOperand)
+        {
+            _equation.Length = _equation.Length - 3;
+        }
+
         _lastIsOperand = false;
         _lastIsCloseBracket = false;
 
@@ -168,7 +174,7 @@ public class Buttons : MonoBehaviour
         //Find matchingbracket pairs and solve for inside them
         for (int i = start; i < end; i++)
         {
-            if(splitEquation[i] == "(")
+            if (splitEquation[i] == "(")
             {
                 if (startIndex == -1)
                 {
@@ -176,13 +182,13 @@ public class Buttons : MonoBehaviour
                 }
                 bracketCount++;
             }
-            else if(splitEquation[i] == ")")
+            else if (splitEquation[i] == ")")
             {
                 bracketCount--;
                 if (bracketCount == 0)
                 {
                     endIndex = i;
-                    string result = SolveEquation(splitEquation, startIndex+1, endIndex);
+                    string result = SolveEquation(splitEquation, startIndex + 1, endIndex);
                     splitEquation.RemoveRange(startIndex, 2);
                     splitEquation[startIndex] = result;
 
@@ -194,9 +200,9 @@ public class Buttons : MonoBehaviour
                 }
             }
         }
-        
+
         //First order Operation
-        for(int i = start; i < end; i++)
+        for (int i = start; i < end; i++)
         {
             if (_firstOrderOfOperations.ContainsKey(splitEquation[i]))
             {
@@ -263,9 +269,9 @@ public class Buttons : MonoBehaviour
         }
 
         _openBracket.interactable = _canOpenBracket;
-        _closeBracket.interactable = _numberOpenBrackets > 0;
+        _closeBracket.interactable = (_numberOpenBrackets > 0 & !_lastIsOperand);
 
-        foreach(Button button in _numberButtons)
+        foreach (Button button in _numberButtons)
         {
             button.interactable = !_lastIsCloseBracket;
         }
