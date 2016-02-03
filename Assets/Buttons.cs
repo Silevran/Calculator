@@ -272,24 +272,15 @@ public class Buttons : MonoBehaviour
         {
             InputNumber("5");
         }
-
-        //Special case for 6 as it can also be used for Caret or Power symbol
-        if (Input.GetKeyDown(KeyCode.Keypad6) || Input.GetKeyDown(KeyCode.Alpha6))
+        if (Input.GetKeyDown(KeyCode.Keypad6))
         {
-            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-            {
-                InputSymbol("^");
-            }
-            else
-            {
-                InputNumber("6");
-            }
+            InputNumber("6");
         }
         if (Input.GetKeyDown(KeyCode.Keypad7) || Input.GetKeyDown(KeyCode.Alpha7))
         {
             InputNumber("7");
         }
-        if (Input.GetKeyDown(KeyCode.Keypad8) || Input.GetKeyDown(KeyCode.Alpha8))
+        if (Input.GetKeyDown(KeyCode.Keypad8))
         {
             InputNumber("8");
         }
@@ -304,7 +295,7 @@ public class Buttons : MonoBehaviour
         #endregion
 
         #region keyboard_symbol_input
-        if (Input.GetKeyDown(KeyCode.KeypadPlus) || Input.GetKeyDown(KeyCode.Plus))
+        if (Input.GetKeyDown(KeyCode.KeypadPlus))
         {
             InputSymbol("+");
         }
@@ -316,11 +307,10 @@ public class Buttons : MonoBehaviour
         {
             InputSymbol("/");
         }
-        if (Input.GetKeyDown(KeyCode.KeypadMultiply) || Input.GetKeyDown(KeyCode.Asterisk))
+        if (Input.GetKeyDown(KeyCode.KeypadMultiply))
         {
             InputSymbol("*");
         }
-        //Note, Power or Caret is in the numbers section because of the overloaded 6 character
         #endregion
 
         #region bracket_symbols
@@ -342,6 +332,42 @@ public class Buttons : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Backspace))
         {
             InputClear("Clear");
+        }
+        #endregion
+
+        #region special_cases
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+            {
+                InputSymbol("^");
+            }
+            else
+            {
+                InputNumber("6");
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+            {
+                InputSymbol("*");
+            }
+            else
+            {
+                InputNumber("8");
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Equals))
+        {
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+            {
+                InputEquals("=");
+            }
+            else
+            {
+                InputSymbol("+");
+            }
         }
         #endregion
     }
